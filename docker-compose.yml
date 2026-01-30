@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:7.0
+    containerName: order-service-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=order-service
+    networks:
+      - order-service-network
+
+  # Optional: Mongo Express for DB visualization
+  mongo-express:
+    image: mongo-express:1.0.2
+    containerName: order-service-mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_URL=mongodb://mongo:27017
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin123
+    depends_on:
+      - mongo
+    networks:
+      - order-service-network
+
+networks:
+  order-service-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
+
