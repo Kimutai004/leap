@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
+import type { Secret } from 'jsonwebtoken';
 import config from '../config';
-import { userRepository, CreateUserDto } from '../repositories/user.repository';
+import { userRepository } from '../repositories/user.repository';
 import { IUser } from '../models/User';
 import logger from '../utils/logger';
 
@@ -85,9 +86,7 @@ export class AuthService {
       role: user.role
     };
 
-    return jwt.sign(payload, config.jwtSecret, {
-      expiresIn: config.jwtExpiresIn
-    });
+    return jwt.sign(payload, config.jwtSecret as Secret, { expiresIn: config.jwtExpiresIn || '1d' });
   }
 
   private sanitizeUser(user: IUser): Omit<IUser, 'passwordHash'> {

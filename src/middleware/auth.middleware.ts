@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import config from '../config';
-import logger from '../utils/logger';
+// import logger from '../utils/logger';
 import { ApiError, UnauthorizedError } from './error.middleware';
 
 export interface AuthRequest extends Request {
@@ -19,27 +19,25 @@ export const authenticate = (
 ): void => {
   try {
     const authHeader = req.headers.authorization;
-    
     if (!authHeader) {
       throw new UnauthorizedError('No authorization header provided');
     }
-    
     const parts = authHeader.split(' ');
-    
     if (parts.length !== 2 || parts[0] !== 'Bearer') {
       throw new UnauthorizedError('Invalid authorization header format');
     }
-    
     const token = parts[1];
-    
+    if (!token || typeof config.jwtSecret !== 'string') {
+      res.status(401).json({ message: 'Invalid token or secret' });
+      return;
+    }
     try {
-      const decoded = jwt.verify(token, config.jwtSecret) as {
-        id: string;
-        email: string;
-        role: 'admin' | 'customer';
+      const decoded = jwt.verify(token, config.jwtSecret) as jwt.JwtPayload;
+      req.user = {
+        id: decoded.id as string,
+        email: decoded.email as string,
+        role: decoded.role as 'admin' | 'customer',
       };
-      
-      req.user = decoded;
       next();
     } catch (jwtError) {
       if (jwtError instanceof jwt.TokenExpiredError) {
@@ -56,7 +54,7 @@ export const authenticate = (
 };
 
 export const authorize = (...roles: Array<'admin' | 'customer'>) => {
-  return (req: AuthRequest, res: Response, next: NextFunction): void => {
+  return (req: AuthRequest, _res: Response, next: NextFunction): void => {
     if (!req.user) {
       throw new UnauthorizedError('User not authenticated');
     }

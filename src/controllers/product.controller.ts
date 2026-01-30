@@ -58,7 +58,7 @@ export const getProduct = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const product = await productService.getProductById(req.params.id);
+    const product = await productService.getProductById(req.params.id ?? '');
 
     if (!product) {
       res.status(404).json({
@@ -90,7 +90,7 @@ export const updateProduct = async (
     if (price !== undefined) updateData.price = price;
     if (stock !== undefined) updateData.stock = stock;
 
-    const product = await productService.updateProduct(req.params.id, updateData);
+    const product = await productService.updateProduct(req.params.id ?? '', updateData);
 
     if (!product) {
       res.status(404).json({
@@ -115,7 +115,7 @@ export const deleteProduct = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const deleted = await productService.deleteProduct(req.params.id);
+    const deleted = await productService.deleteProduct(req.params.id ?? '');
 
     if (!deleted) {
       res.status(404).json({

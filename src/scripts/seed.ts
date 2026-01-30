@@ -62,10 +62,10 @@ async function seed() {
     await Order.create({
       userId: customer1._id,
       items: [
-        { productId: laptop._id, quantity: 1, unitPrice: laptop.price },
-        { productId: headphones._id, quantity: 2, unitPrice: headphones.price }
+        ...(laptop && typeof laptop._id !== 'undefined' && typeof laptop.price !== 'undefined' ? [{ productId: laptop._id, quantity: 1, unitPrice: laptop.price }] : []),
+        ...(headphones && typeof headphones._id !== 'undefined' && typeof headphones.price !== 'undefined' ? [{ productId: headphones._id, quantity: 2, unitPrice: headphones.price }] : [])
       ],
-      total: laptop.price + (2 * headphones.price),
+      total: ((laptop && typeof laptop.price !== 'undefined' ? laptop.price : 0) + (2 * (headphones && typeof headphones.price !== 'undefined' ? headphones.price : 0))),
       status: 'paid'
     });
     console.log('Created sample orders');

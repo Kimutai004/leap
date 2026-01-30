@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { orderService, OrderFilters, CreateOrderDto } from '../services/order.service';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { OrderStatus } from '../models/Order';
@@ -65,7 +65,7 @@ export const getOrder = async (
   try {
     const isAdmin = req.user!.role === 'admin';
     const order = await orderService.getOrderById(
-      req.params.id,
+      req.params.id ?? '',
       req.user!.id,
       isAdmin
     );
@@ -95,7 +95,7 @@ export const payOrder = async (
   try {
     const isAdmin = req.user!.role === 'admin';
     const result = await orderService.payOrder(
-      req.params.id,
+      req.params.id ?? '',
       req.user!.id,
       isAdmin
     );
@@ -118,7 +118,7 @@ export const cancelOrder = async (
   try {
     const isAdmin = req.user!.role === 'admin';
     const result = await orderService.cancelOrder(
-      req.params.id,
+      req.params.id ?? '',
       req.user!.id,
       isAdmin
     );
