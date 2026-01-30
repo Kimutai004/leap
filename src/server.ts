@@ -23,10 +23,9 @@ const startServer = async (): Promise<void> => {
         
         // Close database connection
         import('mongoose').then(({ default: mongoose }) => {
-          mongoose.connection.close(false, () => {
-            logger.info('Database connection closed');
-            process.exit(0);
-          });
+          mongoose.connection.close();
+          logger.info('Database connection closed');
+          process.exit(0);
         });
       });
 
