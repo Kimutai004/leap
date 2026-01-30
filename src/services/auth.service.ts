@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import type { Secret } from 'jsonwebtoken';
 import config from '../config';
 import { userRepository } from '../repositories/user.repository';
 import { IUser } from '../models/User';
@@ -39,7 +38,7 @@ export class AuthService {
     });
 
     // Generate JWT
-    const token = this.generateToken(user);
+    const token = await this.generateToken(user);
 
     logger.info(`User registered: ${user.id} with role: ${user.role}`);
 
@@ -65,7 +64,7 @@ export class AuthService {
     }
 
     // Generate JWT
-    const token = this.generateToken(user);
+    const token = await this.generateToken(user);
 
     logger.info(`User logged in: ${user.id}`);
 
@@ -79,14 +78,26 @@ export class AuthService {
     return userRepository.findById(id);
   }
 
-  private generateToken(user: IUser): string {
+  private async generateToken(user: IUser): Promise<string> {
     const payload = {
       id: user.id,
       email: user.email,
       role: user.role
     };
-
-    return jwt.sign(payload, config.jwtSecret as Secret, { expiresIn: config.jwtExpiresIn || '1d' });
+    return new Promise((resolve, reject) => {
+      jwt.sign(
+        payload,
+        config.jwtSecret as any,
+        { expiresIn: typeof config.jwtExpiresIn === 'string' ? config.jwtExpiresIn : '1d' } as any,
+        (err, token) => {
+          if (err || !token) {
+            reject(err || new Error('Token generation failed'));
+          } else {
+            resolve(token);
+          }
+        }
+      );
+    });
   }
 
   private sanitizeUser(user: IUser): Omit<IUser, 'passwordHash'> {
