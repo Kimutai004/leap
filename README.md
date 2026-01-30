@@ -261,7 +261,4 @@ npm run test:watch
 - ✅ Idempotent payment (double-pay protection)
 - ✅ Order status conflicts (paid/cancelled)
 
-## 📄 License
-
-MIT
 
