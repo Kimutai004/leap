@@ -3,7 +3,7 @@ version: '3.8'
 services:
   mongo:
     image: mongo:7.0
-    containerName: order-service-mongo
+    container_name: order-service-mongo
     ports:
       - "27017:27017"
     volumes:
@@ -16,7 +16,7 @@ services:
   # Optional: Mongo Express for DB visualization
   mongo-express:
     image: mongo-express:1.0.2
-    containerName: order-service-mongo-express
+    container_name: order-service-mongo-express
     ports:
       - "8081:8081"
     environment:
